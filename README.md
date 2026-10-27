@@ -6,9 +6,9 @@
 
 Move and rotate the build preview on every axis before you place it. Sink a piece into the ground, push it a few centimetres, tilt it, and it is built exactly where the preview is.
 
-> **Install it on your client only.** The server and other players do not need it, and they see your pieces normally. Valheim 1.0 · BepInExPack 5.4.2350+ · Console players cannot load the mod.
+> **Install it on your client only.** The server and other players do not need it, and they see your pieces normally. Valheim 1.0 Â· BepInExPack 5.4.2350+ Â· Console players cannot load the mod.
 
-[Bug reports](https://github.com/morda0511/AnyAngle/issues) · [Discord](https://discord.gg/sHZzWFBpRm) · [GitHub](https://github.com/morda0511/AnyAngle)
+[Bug reports](https://github.com/morda0511/AnyAngle/issues) Â· [Discord](https://discord.gg/sHZzWFBpRm) Â· [GitHub](https://github.com/morda0511/AnyAngle)
 
 ![](https://raw.githubusercontent.com/morda0511/AnyAngle/main/thunderstore-assets/anyangle/divider-norse.png)
 
@@ -73,7 +73,7 @@ Steps: 1 cm / 1 degree, 5 cm / 5 degrees, 25 cm / 15 degrees, 1 m / 45 degrees. 
 | **[Morda's Gearhold](https://thunderstore.io/c/valheim/p/Morda/MordasGearhold/)** | Three switchable equipment sets, shared inventory, 8 hotkey quickslots, ammo slots, trinkets, transmog looks and armour dyes |
 | **[Valheim Mannequins](https://thunderstore.io/c/valheim/p/Morda/ValheimMannequins/)** | Player-shaped mannequins: dress them with real gear, pose and name them, keep several gear sets |
 | **[ServerRates](https://thunderstore.io/c/valheim/p/Morda/ServerRates/)** | Server-side rates for dedicated servers (PC and console), live apply, presets. Joining players need no install |
-| **[SmoothBuildRepair](https://github.com/morda0511/SmoothBuildRepair)** | Automatically repairs nearby buildings a few pieces at a time, no lag |
+| **[SmoothBuildRepair](https://thunderstore.io/c/valheim/p/Morda/SmoothBuildRepair/)** | Automatically repairs nearby buildings a few pieces at a time, no lag |
 
 ![](https://raw.githubusercontent.com/morda0511/AnyAngle/main/thunderstore-assets/anyangle/divider-norse.png)
 
