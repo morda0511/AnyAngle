@@ -8,7 +8,7 @@ Move and rotate the build preview on every axis before you place it. Sink a piec
 
 > **Install it on your client only.** The server and other players do not need it, and they see your pieces normally. Valheim 1.0 · BepInExPack 5.4.2350+ · Console players cannot load the mod.
 
-[Bug reports](https://github.com/morda0511/AnyAngle/issues) · [Discord](https://discord.gg/sHZzWFBpRm) · [GitHub](https://github.com/morda0511/AnyAngle) · [Store & Craft](https://github.com/morda0511/StoreAndCraft) · [Forager's Garden](https://github.com/morda0511/ForagersGarden)
+[Bug reports](https://github.com/morda0511/AnyAngle/issues) · [Discord](https://discord.gg/sHZzWFBpRm) · [GitHub](https://github.com/morda0511/AnyAngle)
 
 ![](https://raw.githubusercontent.com/morda0511/AnyAngle/main/thunderstore-assets/anyangle/divider-norse.png)
 
@@ -60,6 +60,20 @@ Steps: 1 cm / 1 degree, 5 cm / 5 degrees, 25 cm / 15 degrees, 1 m / 45 degrees. 
 - This is an early version. Pieces you nudge store their offset as an extra value in the world data. The game and other mods ignore it
 - Mods that also change the build preview or snapping (for example PlanBuild or snap point mods) may conflict
 - A nudged piece that hangs in the air can still collapse if it has no support
+
+![](https://raw.githubusercontent.com/morda0511/AnyAngle/main/thunderstore-assets/anyangle/divider-norse.png)
+
+<h2 align="center">More mods by Morda</h2>
+
+| Mod | What it does |
+|:---|:---|
+| **[Store & Craft](https://thunderstore.io/c/valheim/p/Morda/StoreAndCraft/)** | Auto-store drops, dump your inventory, and craft or build from nearby chests |
+| **[WorkbenchesPlus](https://thunderstore.io/c/valheim/p/Morda/WorkbenchesPlus/)** | Sort and filter crafting menus: craftable first, categories, armor and weapon sets by biome tier |
+| **[Forager's Garden](https://thunderstore.io/c/valheim/p/Morda/ForagersGarden/)** | Berry bushes, wild herbs and mushrooms with the Cultivator, plus Ice, Royal Jelly and Crystal beehives |
+| **[Morda's Gearhold](https://thunderstore.io/c/valheim/p/Morda/MordasGearhold/)** | Three switchable equipment sets, shared inventory, 8 hotkey quickslots, ammo slots, trinkets, transmog looks and armour dyes |
+| **[Valheim Mannequins](https://thunderstore.io/c/valheim/p/Morda/ValheimMannequins/)** | Player-shaped mannequins: dress them with real gear, pose and name them, keep several gear sets |
+| **[ServerRates](https://thunderstore.io/c/valheim/p/Morda/ServerRates/)** | Server-side rates for dedicated servers (PC and console), live apply, presets. Joining players need no install |
+| **[SmoothBuildRepair](https://github.com/morda0511/SmoothBuildRepair)** | Automatically repairs nearby buildings a few pieces at a time, no lag |
 
 ![](https://raw.githubusercontent.com/morda0511/AnyAngle/main/thunderstore-assets/anyangle/divider-norse.png)
 
