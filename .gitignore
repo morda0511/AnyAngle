@@ -1,0 +1,11 @@
+bin/
+obj/
+*.user
+.vs/
+
+# Local only, not published.
+Directory.Build.props
+ANALYSE.md
+thunderstore/
+thunderstore-assets/icon.png
+thunderstore-assets/anyangle/icon-512.png
