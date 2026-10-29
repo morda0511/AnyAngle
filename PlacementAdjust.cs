@@ -24,17 +24,53 @@ namespace AnyAngle
 
         internal static bool Active => Offset != Vector3.zero || Euler != Vector3.zero;
 
+        internal enum Axis { None, Pitch, Yaw, Roll, Depth, Side, Height, Step }
+        static Axis shown;
+        static float shownUntil;
+
+        internal static Axis Shown => Time.unscaledTime <= shownUntil ? shown : Axis.None;
+        internal static string StepName => StepNames[step];
+
+        void LateUpdate() => AxisGizmo.Tick(Plugin.Enabled.Value && Building ? Shown : Axis.None);
+
+        static void CycleStep(int dir) => step = (step + dir + PosSteps.Length) % PosSteps.Length;
+
+        // which axis the mouse wheel controls right now, from the keys you hold
+        static Axis HeldAxis()
+        {
+            if (Input.GetKey(Plugin.WheelDepth.Value)) return Axis.Depth;
+            if (Input.GetKey(Plugin.WheelSide.Value)) return Axis.Side;
+            if (Input.GetKey(Plugin.WheelHeight.Value)) return Axis.Height;
+            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            if (shift && ctrl) return Axis.Step;
+            if (shift) return Axis.Pitch;
+            if (ctrl) return Axis.Roll;
+            return Axis.None;
+        }
+
+        internal static bool MoveKeyHeld => Building && Plugin.Enabled.Value &&
+            (Input.GetKey(Plugin.WheelDepth.Value) || Input.GetKey(Plugin.WheelSide.Value) || Input.GetKey(Plugin.WheelHeight.Value));
+
+        // vanilla must not also turn the piece or zoom the camera while the wheel belongs to us
+        internal static bool WheelTaken => Building && Plugin.Enabled.Value && InputFree() && HeldAxis() != Axis.None;
+
         internal static void Reset()
         {
             Offset = Vector3.zero;
             Euler = Vector3.zero;
+            // also the vanilla turn from the plain mouse wheel
+            Player player = Player.m_localPlayer;
+            if (player != null) HarmonyLib.AccessTools.FieldRefAccess<Player, int>("m_placeRotation")(player) = 0;
+            Plugin.Log.LogInfo("Reset offset and rotation");
         }
 
         void Update()
         {
             if (!Plugin.Enabled.Value || !Building || !InputFree()) { held = KeyCode.None; return; }
 
-            if (Input.GetKeyDown(Plugin.CycleStep.Value)) step = (step + 1) % PosSteps.Length;
+            if (Input.GetKeyDown(Plugin.CycleStep.Value)) CycleStep(1);
+            if (Input.GetKeyDown(Plugin.StepDown.Value)) CycleStep(-1);
             if (Input.GetKeyDown(Plugin.ResetKey.Value)) Reset();
             if (Plugin.CopyKey.Value.IsDown()) CopyFromTarget();
 
@@ -45,12 +81,25 @@ namespace AnyAngle
             Try(Plugin.Left.Value, () => Move(-p, 0, 0));
             Try(Plugin.Up.Value, () => Move(0, p, 0));
             Try(Plugin.Down.Value, () => Move(0, -p, 0));
-            Try(Plugin.PitchUp.Value, () => Euler.x += r);
-            Try(Plugin.PitchDown.Value, () => Euler.x -= r);
-            Try(Plugin.YawRight.Value, () => Euler.y += r);
-            Try(Plugin.YawLeft.Value, () => Euler.y -= r);
-            Try(Plugin.RollRight.Value, () => Euler.z -= r);
-            Try(Plugin.RollLeft.Value, () => Euler.z += r);
+
+            // mouse wheel: the held modifier picks the axis
+            Axis mode = HeldAxis();
+            float now = Time.unscaledTime;
+            if (mode != Axis.None) { shown = mode; shownUntil = now + 0.8f; }
+            int notch = Mathf.RoundToInt(Mathf.Sign(Input.mouseScrollDelta.y) * Mathf.Min(1f, Mathf.Abs(Input.mouseScrollDelta.y)));
+            if (notch != 0)
+            {
+                switch (mode)
+                {
+                    case Axis.None: shown = Axis.Yaw; shownUntil = now + 1.2f; break;   // vanilla turns the piece
+                    case Axis.Pitch: Euler.x += notch * r; break;
+                    case Axis.Roll: Euler.z -= notch * r; break;
+                    case Axis.Step: CycleStep(notch); break;
+                    case Axis.Depth: Move(0, 0, notch * p); break;
+                    case Axis.Side: Move(notch * p, 0, 0); break;
+                    case Axis.Height: Move(0, notch * p, 0); break;
+                }
+            }
 
             float max = Plugin.MaxOffset.Value;
             if (Offset.magnitude > max) Offset = Offset.normalized * max;
@@ -61,8 +110,11 @@ namespace AnyAngle
         {
             Player player = Player.m_localPlayer;
             if (player == null) return;
-            Nudge.CameraAxes(player, out Vector3 r, out Vector3 f);
-            Offset += r * right + Vector3.up * up + f * fwd;
+            // along the piece's own axes, so "forward" is always the same direction of the piece
+            GameObject ghost = AccessTools_Ghost(player);
+            if (ghost == null) return;
+            Nudge.MoveAxes(ghost.transform, out Vector3 r, out Vector3 u, out Vector3 f);
+            Offset += r * right + u * up + f * fwd;
         }
 
         static void CopyFromTarget()
@@ -169,18 +221,20 @@ namespace AnyAngle
 
             var rows = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(Pair(Plugin.Forward.Value, Plugin.Back.Value), "Move forward / back"),
-                new KeyValuePair<string, string>(Pair(Plugin.Left.Value, Plugin.Right.Value), "Move left / right"),
-                new KeyValuePair<string, string>(Pair(Plugin.Up.Value, Plugin.Down.Value), "Move up / down"),
-                new KeyValuePair<string, string>(Pair(Plugin.PitchUp.Value, Plugin.PitchDown.Value), "Tilt"),
-                new KeyValuePair<string, string>(Pair(Plugin.RollLeft.Value, Plugin.RollRight.Value), "Roll"),
-                new KeyValuePair<string, string>(Pair(Plugin.YawLeft.Value, Plugin.YawRight.Value), "Turn"),
-                new KeyValuePair<string, string>(Name(Plugin.CycleStep.Value), "Step size: " + StepNames[step]),
+                new KeyValuePair<string, string>("Wheel", "Turn (Y)"),
+                new KeyValuePair<string, string>("Shift + Wheel", "Tilt (X)"),
+                new KeyValuePair<string, string>("Ctrl + Wheel", "Roll (Z)"),
+                new KeyValuePair<string, string>(Name(Plugin.WheelDepth.Value) + " + Wheel", "Move forward / back"),
+                new KeyValuePair<string, string>(Name(Plugin.WheelSide.Value) + " + Wheel", "Move left / right"),
+                new KeyValuePair<string, string>(Name(Plugin.WheelHeight.Value) + " + Wheel", "Move up / down"),
+                new KeyValuePair<string, string>("Shift + Ctrl + Wheel", "Step size: " + StepNames[step]),
+                new KeyValuePair<string, string>(Pair(Plugin.CycleStep.Value, Plugin.StepDown.Value), "Step size up / down"),
+                new KeyValuePair<string, string>("Arrows, PgUp, PgDn", "Move with keys"),
                 new KeyValuePair<string, string>(Name(Plugin.ResetKey.Value), "Reset"),
                 new KeyValuePair<string, string>(Plugin.CopyKey.Value.ToString().Replace(" + ", "+"), "Copy from piece"),
             };
 
-            float rowH = 28 * s, pad = 12 * s, chipW = 130 * s, width = 360 * s;
+            float rowH = 28 * s, pad = 12 * s, chipW = 190 * s, width = 440 * s;
             float height = pad * 2 + rowH * (rows.Count + 2);
             var box = new Rect(Screen.width - width - 24 * s, Screen.height - height - 110 * s, width, height);
             GUI.DrawTexture(box, panelTex);
@@ -201,7 +255,10 @@ namespace AnyAngle
             string foot = string.Format("Offset up {0:0.00}  side {1:0.00} m   Rot {2:0.#} / {3:0.#} / {4:0.#}",
                 Offset.y, new Vector2(Offset.x, Offset.z).magnitude, Euler.x, Euler.y, Euler.z);
             GUI.Label(new Rect(box.x + pad, y + 2 * s, width - pad * 2, rowH), foot, footStyle);
+
+            AxisGizmo.DrawLabel(s, titleStyle);
         }
+
 
         static Piece SelectedPiece()
         {
@@ -211,6 +268,6 @@ namespace AnyAngle
             return ghost != null ? ghost.GetComponent<Piece>() : null;
         }
 
-        static GameObject AccessTools_Ghost(Player p) => HarmonyLib.AccessTools.FieldRefAccess<Player, GameObject>("m_placementGhost")(p);
+        internal static GameObject AccessTools_Ghost(Player p) => HarmonyLib.AccessTools.FieldRefAccess<Player, GameObject>("m_placementGhost")(p);
     }
 }

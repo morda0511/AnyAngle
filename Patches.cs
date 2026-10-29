@@ -26,6 +26,18 @@ namespace AnyAngle
             right = Vector3.Cross(Vector3.up, fwd);
         }
 
+        // move directions that follow the way the piece faces but stay level, so tilting or rolling it
+        // never turns "left / right" into up / down
+        internal static void MoveAxes(Transform piece, out Vector3 right, out Vector3 up, out Vector3 fwd)
+        {
+            up = Vector3.up;
+            fwd = Vector3.ProjectOnPlane(piece.forward, up);
+            if (fwd.sqrMagnitude < 0.01f) fwd = Vector3.ProjectOnPlane(piece.up, up);   // piece stands on its end
+            if (fwd.sqrMagnitude < 0.0001f) fwd = Vector3.forward;
+            fwd.Normalize();
+            right = Vector3.Cross(up, fwd);
+        }
+
         internal static Vector3 HitPoint;      // where the crosshair ray hit
 
         // Turn the ghost around the point you aim at (where vanilla put the selected snap point),
@@ -72,7 +84,10 @@ namespace AnyAngle
         static void Postfix(Player __instance)
         {
             GameObject ghost = Ghost(__instance);
-            PlacementAdjust.Building = ghost != null && __instance == Player.m_localPlayer;
+            bool building = ghost != null && __instance == Player.m_localPlayer;
+            if (building != PlacementAdjust.Building)
+                Plugin.Log.LogInfo("Build ghost " + (building ? "active" : "gone") + (ghost != null ? " (" + ghost.name + ")" : ""));
+            PlacementAdjust.Building = building;
             if (!PlacementAdjust.Building || !Nudge.Ready || !ghost.activeSelf) return;
 
             Vector3 world = PlacementAdjust.Offset;
@@ -134,6 +149,47 @@ namespace AnyAngle
         {
             if (__result && b != null) Nudge.SnapTarget = b.GetComponentInParent<Piece>();
         }
+    }
+
+    // while a modifier or move key is held the wheel belongs to this mod, not to vanilla rotation or camera zoom
+    [HarmonyPatch(typeof(ZInput), nameof(ZInput.GetMouseScrollWheel))]
+    internal static class WheelPatch
+    {
+        static bool Prefix(ref float __result)
+        {
+            if (!PlacementAdjust.WheelTaken) return true;
+            __result = 0f;
+            return false;
+        }
+    }
+
+    // the move keys are normal keys in vanilla too (X = sit); while one is held the game must not react to it
+    [HarmonyPatch(typeof(ZInput), nameof(ZInput.GetButtonDown), new[] { typeof(string) })]
+    internal static class MoveKeyDownPatch
+    {
+        static bool Prefix(string name, ref bool __result)
+        {
+            if (!PlacementAdjust.MoveKeyHeld || !MoveKeyPatch.Blocked(name)) return true;
+            __result = false;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(ZInput), nameof(ZInput.GetButton), new[] { typeof(string) })]
+    internal static class MoveKeyHeldPatch
+    {
+        static bool Prefix(string name, ref bool __result)
+        {
+            if (!PlacementAdjust.MoveKeyHeld || !MoveKeyPatch.Blocked(name)) return true;
+            __result = false;
+            return false;
+        }
+    }
+
+    internal static class MoveKeyPatch
+    {
+        internal static bool Blocked(string name) =>
+            name == "Sit" || name == "AutoRun" || name == "Crouch" || name == "Inventory" || name == "Map" || name == "Hide" || name == "Jump";
     }
 
     [HarmonyPatch(typeof(Player), nameof(Player.PlacePiece))]
