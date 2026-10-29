@@ -6,9 +6,9 @@
 
 Move and rotate the build preview on every axis before you place it. Sink a piece into the ground, push it a few centimetres, tilt it, and it is built exactly where the preview is. Everything runs on the mouse wheel and a few modifier keys, a gizmo shows which axis you are on.
 
-> **Install it on your client only.** The server and other players do not need it, and they see your pieces normally. Valheim 1.0 · BepInExPack 5.4.2350+ · Console players cannot load the mod.
+> **Install it on your client only.** The server and other players do not need it, and they see your pieces normally. Valheim 1.0 | BepInExPack 5.4.2350+ | Console players cannot load the mod.
 
-[Bug reports](https://github.com/morda0511/AnyAngle/issues) · [Discord](https://discord.gg/sHZzWFBpRm) · [GitHub](https://github.com/morda0511/AnyAngle)
+[Bug reports](https://github.com/morda0511/AnyAngle/issues) | [Discord](https://discord.gg/sHZzWFBpRm) | [GitHub](https://github.com/morda0511/AnyAngle)
 
 ![](https://raw.githubusercontent.com/morda0511/AnyAngle/main/thunderstore-assets/anyangle/dividers/divider-at-a-glance.png)
 
