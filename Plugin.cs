@@ -11,7 +11,7 @@ namespace AnyAngle
     {
         public const string ModGuid = "com.morda.anyangle";
         public const string ModName = "AnyAngle";
-        public const string ModVersion = "0.1.1";
+        public const string ModVersion = "0.1.2";
 
         internal static BepInEx.Logging.ManualLogSource Log;
 
@@ -49,7 +49,7 @@ namespace AnyAngle
             StepDown = Config.Bind(k, "StepDown", KeyCode.KeypadMinus, "Previous step size.");
             ResetKey = Config.Bind(k, "Reset", KeyCode.Delete, "Reset offset and rotation.");
 
-            CopyKey = Config.Bind(k, "CopyNudge", new KeyboardShortcut(KeyCode.C, KeyCode.LeftAlt),
+            CopyKey = Config.Bind(k, "CopyNudge", new KeyboardShortcut(KeyCode.C, KeyCode.LeftControl),
                 "Look at a piece you built with this mod and press this to take over its offset and rotation.");
 
             gameObject.AddComponent<PlacementAdjust>();

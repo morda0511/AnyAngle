@@ -39,7 +39,7 @@ Every key can be changed in `BepInEx/config/com.morda.anyangle.cfg`. You need no
 | **Arrows, PgUp, PgDn** | Move with keys (hold to repeat) |
 | **Num + / Num -** | Step size up / down |
 | **Delete** | Reset offset and rotation |
-| **Alt + C** | Copy offset and rotation from the piece you look at |
+| **Ctrl + C** | Copy offset and rotation from the piece you look at |
 
 Steps: 1 cm / 1 degree, 5 cm / 5 degrees, 25 cm / 15 degrees, 1 m / 45 degrees.
 
